@@ -16,6 +16,7 @@
 | `docs/postmortem.md` | #16 | docs: Spearman 결측치 처리 부검 (가상 시나리오) | `type: docs` |
 
 이슈 본문은 각 문서의 **전체 마크다운**을 그대로 사용했습니다.
+이후 TIL 형식을 `What → Why → How`에서 `Why → What → How`로 수정하면서 #14의 본문도 다시 동기화했습니다.
 
 ---
 
@@ -168,7 +169,41 @@ cmd /c "gh api repos/ilovejava26/ai-issue/issues/14 --jq .body > C:\Users\user\A
 
 ---
 
-## 7. 커밋 및 push
+## 7. 문서 수정 후 이슈 본문 동기화
+
+TIL의 형식을 **Why → What → How**로 바로잡은 뒤, 기존 이슈의 본문도 수정된 문서 내용으로 갱신했습니다.
+
+```bash
+gh issue edit 14 --body-file docs/til.md
+gh issue edit 15 --body-file docs/retrospective.md
+gh issue edit 16 --body-file docs/postmortem.md
+```
+
+실행 결과:
+
+```text
+https://github.com/ilovejava26/ai-issue/issues/14
+https://github.com/ilovejava26/ai-issue/issues/15
+https://github.com/ilovejava26/ai-issue/issues/16
+```
+
+검증: #14 본문의 Day 1이 `Why → What → How` 순서인지 확인했습니다.
+
+```powershell
+cmd /c "gh api repos/ilovejava26/ai-issue/issues/14 --jq .body > C:\Users\user\AppData\Local\Temp\opencode\body14_v2.md"
+```
+
+```markdown
+- **Why**: 통계 라이브러리는 결과의 재현성이 핵심이다. 개발 환경이 사람마다 다르면 수치 검증 자체가 신뢰를 잃는다.
+- **What**: `src/` 레이아웃, `pyproject.toml`, `ruff`/`mypy`/`pytest` 설정, 의존성 lock 파일을 구성했다.
+- **How**: 버전을 고정하고, README의 설치 절차만으로 새 환경이 만들어지는지 매번 확인한다.
+```
+
+---
+
+## 8. 커밋 및 push
+
+### 8-1. 최초 문서 등록
 
 변경 사항 확인:
 
@@ -199,17 +234,27 @@ git push origin main
 - `step2.md` — 라벨·마일스톤·이슈 등록 명령 정리
 - `step3.md` — 문서를 이슈로 등록한 명령 정리
 
+### 8-2. TIL 형식 수정
+
+TIL을 `Why → What → How` 순서로 고친 뒤 수정 사항을 다시 커밋했습니다.
+
+```powershell
+git add docs/til.md step3.md
+git commit -m "docs: align TIL with Why-What-How and sync issues"
+git push origin main
+```
+
 ---
 
-## 8. 트러블슈팅
+## 9. 트러블슈팅
 
-### 8-1. Git Bash에서 `gh: command not found`
+### 9-1. Git Bash에서 `gh: command not found`
 
 ```bash
 export PATH="/c/Program Files/GitHub CLI:$PATH"
 ```
 
-### 8-2. PowerShell에서 Git Bash 명령의 따옴표가 사라짐
+### 9-2. PowerShell에서 Git Bash 명령의 따옴표가 사라짐
 
 ```powershell
 # 실패: 내부 큰따옴표가 제거되어 경로가 분리됨
@@ -222,7 +267,7 @@ export PATH="/c/Program Files/GitHub CLI:$PATH"
 & 'C:\Program Files\Git\bin\bash.exe' '/c/Users/user/AppData/Local/Temp/opencode/create_doc_issues.sh'
 ```
 
-### 8-3. PowerShell에서 한글 제목이 깨질 때
+### 9-3. PowerShell에서 한글 제목이 깨질 때
 
 `gh issue create --title "한글"` 대신, UTF-8 JSON 파일과 `gh api --input`을 사용합니다. (step 2 방식)
 
@@ -239,7 +284,7 @@ gh api -X POST repos/ilovejava26/ai-issue/issues --input issue.json
 
 ---
 
-## 9. 최종 상태
+## 10. 최종 상태
 
 | 항목 | 결과 |
 | --- | --- |
